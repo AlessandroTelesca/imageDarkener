@@ -20,6 +20,7 @@ const previewCanvas = mustElement<HTMLCanvasElement>("previewCanvas");
 const referenceImage = mustElement<HTMLImageElement>("referenceImage");
 const saveBtn = mustElement<HTMLButtonElement>("saveBtn");
 const resetBtn = mustElement<HTMLButtonElement>("resetBtn");
+const pickColorBtn = mustElement<HTMLButtonElement>("pickColorBtn");
 const statusText = mustElement<HTMLParagraphElement>("statusText");
 
 const previewCtx = mustCanvasContext(previewCanvas);
@@ -27,6 +28,7 @@ const previewCtx = mustCanvasContext(previewCanvas);
 const sliderMap: Record<string, SliderSet> = {};
 let sourceImageData: ImageData | null = null;
 let isSyncing = false;
+let isPickColorMode = false;
 
 buildSliderGroup("out", outputSlidersRoot);
 buildSliderGroup("min", minimumSlidersRoot);
@@ -34,6 +36,8 @@ buildSliderGroup("min", minimumSlidersRoot);
 imageUpload.addEventListener("change", onImageUpload);
 saveBtn.addEventListener("click", onSave);
 resetBtn.addEventListener("click", onReset);
+pickColorBtn.addEventListener("click", togglePickColorMode);
+previewCanvas.addEventListener("click", onCanvasClick);
 window.addEventListener("resize", updatePreview);
 
 function mustElement<T extends HTMLElement>(id: string): T {
@@ -125,10 +129,64 @@ async function onImageUpload(): Promise<void> {
     drawSourceToCanvas(img);
     referenceImage.src = objectUrl;
     statusText.textContent = `Loaded ${file.name}`;
+    setPickColorMode(false);
     updatePreview();
   } finally {
     setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
   }
+}
+
+function togglePickColorMode(): void {
+  if (!sourceImageData) {
+    statusText.textContent = "Upload an image before picking a color.";
+    return;
+  }
+
+  setPickColorMode(!isPickColorMode);
+  if (isPickColorMode) {
+    statusText.textContent = "Click the preview image to sample a color.";
+  }
+}
+
+function setPickColorMode(enabled: boolean): void {
+  isPickColorMode = enabled;
+  pickColorBtn.classList.toggle("is-active", enabled);
+  previewCanvas.classList.toggle("picker-active", enabled);
+}
+
+function onCanvasClick(event: MouseEvent): void {
+  if (!isPickColorMode || !sourceImageData) {
+    return;
+  }
+
+  const rect = previewCanvas.getBoundingClientRect();
+  const canvasX = Math.floor((event.clientX - rect.left) * (previewCanvas.width / rect.width));
+  const canvasY = Math.floor((event.clientY - rect.top) * (previewCanvas.height / rect.height));
+
+  const x = clamp(canvasX, 0, sourceImageData.width - 1);
+  const y = clamp(canvasY, 0, sourceImageData.height - 1);
+  const index = (y * sourceImageData.width + x) * 4;
+
+  const red = sourceImageData.data[index];
+  const green = sourceImageData.data[index + 1];
+  const blue = sourceImageData.data[index + 2];
+
+  setSliderValue("min_r", red);
+  setSliderValue("min_g", green);
+  setSliderValue("min_b", blue);
+
+  setPickColorMode(false);
+  statusText.textContent = `Sampled color R:${red} G:${green} B:${blue}`;
+  updatePreview();
+}
+
+function setSliderValue(key: string, value: number): void {
+  sliderMap[key].input.value = String(value);
+  sliderMap[key].valueText.textContent = String(value);
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -227,5 +285,6 @@ function onReset(): void {
 
   outputLock.checked = false;
   minimumLock.checked = false;
+  setPickColorMode(false);
   updatePreview();
 }

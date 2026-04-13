@@ -176,6 +176,11 @@ body {
   background: #0b1220;
 }
 
+#previewCanvas.picker-active {
+  cursor: crosshair;
+  border-color: var(--accent);
+}
+
 #statusText {
   margin: 10px 2px 0;
   font-size: 0.9rem;
@@ -211,6 +216,11 @@ button:hover {
 .secondary {
   background: var(--paper-2);
   border-color: var(--line);
+}
+
+#pickColorBtn.is-active {
+  background: #20324f;
+  border-color: var(--accent);
 }
 
 input,
