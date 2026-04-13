@@ -28,3 +28,5 @@ htmlcov/
 
 # Generated output files
 img_bright_recolored.jpg
+web/*.js
+web/*.js.map
