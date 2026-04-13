@@ -1,3 +1,5 @@
+export {};
+
 type GroupName = "out" | "min";
 type ChannelName = "r" | "g" | "b";
 

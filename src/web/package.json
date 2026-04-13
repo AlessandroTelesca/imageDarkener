@@ -3,9 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build:web:entry": "tsc web/main.ts --target ES2020 --module ESNext --moduleResolution Bundler --strict --skipLibCheck --outDir web --noEmit false",
-    "predev:web": "npm run build:web:entry",
-    "prebuild:web": "npm run build:web:entry",
     "dev:web": "vite",
     "build:web": "vite build",
     "preview:web": "vite preview"
