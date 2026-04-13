@@ -29,6 +29,7 @@ const sliderMap: Record<string, SliderSet> = {};
 let sourceImageData: ImageData | null = null;
 let isSyncing = false;
 let isPickColorMode = false;
+let referenceImageUrl: string | null = null;
 
 buildSliderGroup("out", outputSlidersRoot);
 buildSliderGroup("min", minimumSlidersRoot);
@@ -40,6 +41,7 @@ pickColorBtn.addEventListener("click", togglePickColorMode);
 previewCanvas.addEventListener("click", onCanvasClick);
 previewCanvas.addEventListener("pointerdown", onCanvasPointerDown);
 window.addEventListener("resize", updatePreview);
+window.addEventListener("beforeunload", releaseReferenceImageUrl);
 
 function mustElement<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -128,12 +130,17 @@ async function onImageUpload(): Promise<void> {
   try {
     const img = await loadImage(objectUrl);
     drawSourceToCanvas(img);
+    if (referenceImageUrl) {
+      URL.revokeObjectURL(referenceImageUrl);
+    }
+    referenceImageUrl = objectUrl;
     referenceImage.src = objectUrl;
     statusText.textContent = `Loaded ${file.name}`;
     setPickColorMode(false);
     updatePreview();
-  } finally {
-    setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  } catch {
+    URL.revokeObjectURL(objectUrl);
+    statusText.textContent = "Could not load this image on this browser. Try a JPG or PNG from gallery.";
   }
 }
 
@@ -212,6 +219,15 @@ function loadImage(src: string): Promise<HTMLImageElement> {
     img.onerror = () => reject(new Error("Failed to load image."));
     img.src = src;
   });
+}
+
+function releaseReferenceImageUrl(): void {
+  if (!referenceImageUrl) {
+    return;
+  }
+
+  URL.revokeObjectURL(referenceImageUrl);
+  referenceImageUrl = null;
 }
 
 function drawSourceToCanvas(img: HTMLImageElement): void {
