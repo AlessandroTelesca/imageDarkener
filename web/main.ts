@@ -297,50 +297,14 @@ function onSave(): void {
       return;
     }
 
-    const fileName = "img_bright_recolored.png";
-    const file = new File([blob], fileName, { type: "image/png" });
-
-    if (canShareFile(file)) {
-      void shareFile(fileName, file);
-      return;
-    }
-
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = fileName;
-    link.rel = "noopener";
-    document.body.append(link);
+    link.download = "img_bright_recolored.png";
     link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    URL.revokeObjectURL(url);
     statusText.textContent = "Saved img_bright_recolored.png";
   }, "image/png");
-}
-
-function canShareFile(file: File): boolean {
-  if (!("share" in navigator) || !("canShare" in navigator)) {
-    return false;
-  }
-
-  const shareNavigator = navigator as Navigator & {
-    canShare: (data?: ShareData) => boolean;
-  };
-
-  return shareNavigator.canShare({ files: [file] });
-}
-
-async function shareFile(fileName: string, file: File): Promise<void> {
-  try {
-    await navigator.share({
-      files: [file],
-      title: fileName,
-      text: "Edited image",
-    });
-    statusText.textContent = "Shared image.";
-  } catch {
-    statusText.textContent = "Share canceled.";
-  }
 }
 
 function onReset(): void {

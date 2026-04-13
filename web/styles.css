@@ -25,7 +25,6 @@ body {
   font-family: "Space Grotesk", sans-serif;
   color: var(--ink-1);
   background: radial-gradient(circle at 10% 12%, #1f293d 0%, #121923 45%, #0a0f17 100%);
-  -webkit-tap-highlight-color: transparent;
 }
 
 .bg {
@@ -175,7 +174,6 @@ body {
   border-radius: 10px;
   border: 1px solid var(--line);
   background: #0b1220;
-  touch-action: manipulation;
 }
 
 #previewCanvas.picker-active {
@@ -253,36 +251,5 @@ p {
 
   .preview-panel {
     min-height: 420px;
-  }
-}
-
-@media (max-width: 640px) {
-  .app-shell {
-    width: min(1200px, 96vw);
-    margin: 12px auto;
-    gap: 12px;
-  }
-
-  .topbar,
-  .controls-panel,
-  .preview-panel {
-    padding: 12px;
-  }
-
-  .button-row {
-    flex-wrap: wrap;
-  }
-
-  .button-row button {
-    flex: 1;
-    min-height: 44px;
-  }
-
-  #imageUpload {
-    width: 100%;
-  }
-
-  #statusText {
-    font-size: 0.85rem;
   }
 }

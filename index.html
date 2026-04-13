@@ -64,6 +64,10 @@
     </section>
   </main>
 
-  <script type="module" src="./web/main.ts"></script>
+  <script type="module">
+    import("./web/main.ts").catch(async () => {
+      await import("./web/main.js");
+    });
+  </script>
 </body>
 </html>
