@@ -38,6 +38,7 @@ saveBtn.addEventListener("click", onSave);
 resetBtn.addEventListener("click", onReset);
 pickColorBtn.addEventListener("click", togglePickColorMode);
 previewCanvas.addEventListener("click", onCanvasClick);
+previewCanvas.addEventListener("pointerdown", onCanvasPointerDown);
 window.addEventListener("resize", updatePreview);
 
 function mustElement<T extends HTMLElement>(id: string): T {
@@ -155,13 +156,28 @@ function setPickColorMode(enabled: boolean): void {
 }
 
 function onCanvasClick(event: MouseEvent): void {
+  if (event.detail === 0) {
+    return;
+  }
+  sampleFromClientPosition(event.clientX, event.clientY);
+}
+
+function onCanvasPointerDown(event: PointerEvent): void {
+  if (event.pointerType === "mouse") {
+    return;
+  }
+  event.preventDefault();
+  sampleFromClientPosition(event.clientX, event.clientY);
+}
+
+function sampleFromClientPosition(clientX: number, clientY: number): void {
   if (!isPickColorMode || !sourceImageData) {
     return;
   }
 
   const rect = previewCanvas.getBoundingClientRect();
-  const canvasX = Math.floor((event.clientX - rect.left) * (previewCanvas.width / rect.width));
-  const canvasY = Math.floor((event.clientY - rect.top) * (previewCanvas.height / rect.height));
+  const canvasX = Math.floor((clientX - rect.left) * (previewCanvas.width / rect.width));
+  const canvasY = Math.floor((clientY - rect.top) * (previewCanvas.height / rect.height));
 
   const x = clamp(canvasX, 0, sourceImageData.width - 1);
   const y = clamp(canvasY, 0, sourceImageData.height - 1);
@@ -265,14 +281,50 @@ function onSave(): void {
       return;
     }
 
+    const fileName = "img_bright_recolored.png";
+    const file = new File([blob], fileName, { type: "image/png" });
+
+    if (canShareFile(file)) {
+      void shareFile(fileName, file);
+      return;
+    }
+
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "img_bright_recolored.png";
+    link.download = fileName;
+    link.rel = "noopener";
+    document.body.append(link);
     link.click();
-    URL.revokeObjectURL(url);
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
     statusText.textContent = "Saved img_bright_recolored.png";
   }, "image/png");
+}
+
+function canShareFile(file: File): boolean {
+  if (!("share" in navigator) || !("canShare" in navigator)) {
+    return false;
+  }
+
+  const shareNavigator = navigator as Navigator & {
+    canShare: (data?: ShareData) => boolean;
+  };
+
+  return shareNavigator.canShare({ files: [file] });
+}
+
+async function shareFile(fileName: string, file: File): Promise<void> {
+  try {
+    await navigator.share({
+      files: [file],
+      title: fileName,
+      text: "Edited image",
+    });
+    statusText.textContent = "Shared image.";
+  } catch {
+    statusText.textContent = "Share canceled.";
+  }
 }
 
 function onReset(): void {
