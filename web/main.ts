@@ -7,7 +7,7 @@ type SliderSet = {
 };
 
 const defaultValues = {
-  out: { r: 40, g: 40, b: 40 },
+  out: { r: 125, g: 125, b: 125 },
   min: { r: 125, g: 125, b: 125 },
 };
 
