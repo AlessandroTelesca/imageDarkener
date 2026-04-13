@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Darkener Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./web/styles.css" />
+</head>
+<body>
+  <div class="bg"></div>
+  <main class="app-shell">
+    <header class="topbar">
+      <h1>Image Darkener</h1>
+      <p>Browser version</p>
+    </header>
+
+    <section class="controls-panel">
+      <div class="control-block">
+        <label for="imageUpload" class="label">Image</label>
+        <input id="imageUpload" type="file" accept="image/*" />
+      </div>
+
+      <div class="reference-wrap">
+        <h2>Original Reference</h2>
+        <img id="referenceImage" alt="Original reference" />
+      </div>
+
+      <div class="control-block with-lock">
+        <h2>Targetcolor</h2>
+        <label class="lock-toggle">
+          <input id="outputLock" type="checkbox" />
+          <span>Lock Sliders</span>
+        </label>
+      </div>
+
+      <div class="slider-grid" id="outputSliders"></div>
+
+      <div class="control-block with-lock">
+        <h2>Color-Threshhold</h2>
+        <label class="lock-toggle">
+          <input id="minimumLock" type="checkbox" />
+          <span>Lock Sliders</span>
+        </label>
+      </div>
+
+      <div class="slider-grid" id="minimumSliders"></div>
+
+      <div class="button-row">
+        <button id="saveBtn" type="button">Save</button>
+        <button id="resetBtn" type="button" class="secondary">Reset</button>
+      </div>
+    </section>
+
+    <section class="preview-panel">
+      <canvas id="previewCanvas"></canvas>
+      <p id="statusText">Upload an image to begin.</p>
+    </section>
+  </main>
+
+  <script type="module" src="./web/main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "image-darkener-web",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev:web": "vite",
+    "build:web": "vite build",
+    "preview:web": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^7.1.0"
+  }
+}
